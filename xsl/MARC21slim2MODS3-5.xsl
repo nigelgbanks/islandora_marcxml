@@ -6,8 +6,13 @@
 	<xsl:strip-space elements="*"/>
 
 	<!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
-	MARC21slim2MODS3-5 (Revision 1.96) 20140502
+	MARC21slim2MODS3-5 (Revision 1.101) 20140806
 	
+Revision 1.101 - Fixed 130 tmee 20140806
+Revision 1.100 - Fixed 245c tmee 20140804
+Revision 1.99 - Fixed 240 tmee 20140804
+Revision 1.98 - Fixed 336 mapping tmee 20140522
+Revision 1.97 - Fixed 264 mapping tmee 20140521
 Revision 1.96 - Fixed 310 and 321 and 008 frequency authority for marcfrequency tmee 2014/04/22
 Revision 1.95 - Modified 035 to include identifier type (WlCaITV) tmee 2014/04/21	
 Revision 1.94 - Leader 07 b changed mapping from continuing to serial tmee 2014/02/21
@@ -110,7 +115,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 		<xsl:choose>
 			<xsl:when test="//marc:collection">
 				<modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd">
+					xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd">
 					<xsl:for-each select="//marc:collection/marc:record">
 						<mods version="3.5">
 							<xsl:call-template name="marcRecord"/>
@@ -882,7 +887,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 				</frequency>
 			</xsl:for-each>
 			
-			<!--	1.67 1.72 updated fixed location issue 201308 1.86	-->
+			<!-- 1.67 1.72 updated fixed location issue 201308 1.86	-->
 			
 			<xsl:if test="$typeOf008='SE'">
 				<xsl:for-each select="marc:controlfield[@tag=008]">
@@ -925,11 +930,11 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 		<!-- originInfo - 264 -->
 
 		<xsl:for-each select="marc:datafield[@tag=264][@ind2=0]">
-			<originInfo displayLabel="producer">
+			<originInfo eventType="production">
 				<!-- Template checks for altRepGroup - 880 $6 -->
 				<xsl:call-template name="xxx880"/>
 				<place>
-					<placeTerm>
+					<placeTerm type="text">
 						<xsl:value-of select="marc:subfield[@code='a']"/>
 					</placeTerm>
 				</place>
@@ -942,22 +947,13 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 			</originInfo>
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=264][@ind2=1]">
-			<originInfo displayLabel="publisher">
+			<originInfo eventType="publication">
 				<!-- Template checks for altRepGroup - 880 $6 1.88 20130829 added chopPunc-->
 				<xsl:call-template name="xxx880"/>
 				<place>
-					<placeTerm>
-						
-						<xsl:attribute name="type">text</xsl:attribute>
-						<xsl:call-template name="chopPunctuationFront">
-							<xsl:with-param name="chopString">
-								<xsl:call-template name="chopPunctuation">
-									<xsl:with-param name="chopString" select="."/>
-								</xsl:call-template>
-							</xsl:with-param>
-						</xsl:call-template>
-				
-					</placeTerm>
+						<placeTerm type="text">
+							<xsl:value-of select="marc:subfield[@code='a']"/>
+						</placeTerm>
 				</place>
 				<publisher>
 					<xsl:value-of select="marc:subfield[@code='b']"/>
@@ -968,11 +964,11 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 			</originInfo>
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=264][@ind2=2]">
-			<originInfo displayLabel="distributor">
+			<originInfo eventType="distribution">
 				<!-- Template checks for altRepGroup - 880 $6 -->
 				<xsl:call-template name="xxx880"/>
 				<place>
-					<placeTerm>
+					<placeTerm type="text">
 						<xsl:value-of select="marc:subfield[@code='a']"/>
 					</placeTerm>
 				</place>
@@ -985,11 +981,11 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 			</originInfo>
 		</xsl:for-each>
 		<xsl:for-each select="marc:datafield[@tag=264][@ind2=3]">
-			<originInfo displayLabel="manufacturer">
+			<originInfo eventType="manufacture">
 				<!-- Template checks for altRepGroup - 880 $6 -->
 				<xsl:call-template name="xxx880"/>
 				<place>
-					<placeTerm>
+					<placeTerm type="text">
 						<xsl:value-of select="marc:subfield[@code='a']"/>
 					</placeTerm>
 				</place>
@@ -1075,15 +1071,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 								<xsl:with-param name="codes">a</xsl:with-param>
 							</xsl:call-template>
 						</form>
-						<form>
-							<xsl:attribute name="authority">
-								<xsl:value-of select="marc:subfield[@code='2']"/>
-							</xsl:attribute>
-							<xsl:call-template name="xxx880"/>
-							<xsl:call-template name="subfieldSelect">
-								<xsl:with-param name="codes">ab</xsl:with-param>
-							</xsl:call-template>
-						</form>
+	
 					</physicalDescription>
 				</xsl:when>
 			</xsl:choose>
@@ -2677,7 +2665,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 			</xsl:for-each>
 
 			<recordOrigin>Converted from MARCXML to MODS version 3.5 using MARC21slim2MODS3-5.xsl
-				(Revision 1.96 2014/05/02)</recordOrigin>
+				(Revision 1.101 2014/08/06)</recordOrigin>
 
 			<xsl:for-each select="marc:datafield[@tag=040]/marc:subfield[@code='b']">
 				<languageOfCataloging>
@@ -4065,9 +4053,9 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 
 	<!-- titleInfo 130 730 245 246 240 740 210 -->
 
-	<!-- 130 -->
+	<!-- 130 tmee 1.101 20140806-->
 	<xsl:template name="createTitleInfoFrom130">
-		<xsl:for-each select="marc:datafield[@tag='130'][@ind2!='2']">
+
 			<titleInfo type="uniform">
 				<title>
 					<xsl:variable name="str">
@@ -4091,7 +4079,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 				</title>
 				<xsl:call-template name="part"/>
 			</titleInfo>
-		</xsl:for-each>
+		
 	</xsl:template>
 	<xsl:template name="createTitleInfoFrom730">
 		<titleInfo type="uniform">
@@ -4292,13 +4280,15 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 				<xsl:call-template name="role"/>
 			</name>
 		</xsl:if>
+		<!-- 1.99 240 fix 20140804 -->
 		<xsl:if test="@ind1='3'">
 			<name type="family">
 				<xsl:attribute name="usage">
 					<xsl:text>primary</xsl:text>
 				</xsl:attribute>
 				<xsl:call-template name="xxx880"/>
-				<xsl:if test="//marc:datafield[@tag='240']">
+			
+				<xsl:if test="ancestor::marcrecord//marc:datafield[@tag='240']">
 					<xsl:attribute name="nameTitleGroup">
 						<xsl:text>1</xsl:text>
 					</xsl:attribute>
@@ -4439,10 +4429,11 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 			<!-- Template checks for altRepGroup - 880 $6 -->
 			<xsl:call-template name="xxx880"/>
 			<xsl:call-template name="subfieldSelect">
-				<xsl:with-param name="codes">ab</xsl:with-param>
+				<xsl:with-param name="codes">a</xsl:with-param>
 				<xsl:with-param name="delimeter">-</xsl:with-param>
 			</xsl:call-template>
 		</genre>
+
 	</xsl:template>
 
 	<xsl:template name="createGenreFrom655">
@@ -4508,8 +4499,10 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 
 	<!-- note 245c thru 585 -->
 
+
+	<!-- 1.100 245c 20140804 -->
 	<xsl:template name="createNoteFrom245c">
-		
+		<xsl:if test="marc:subfield[@code='c']">
 				<note type="statement of responsibility">
 					<xsl:attribute name="altRepGroup">
 						<xsl:text>00</xsl:text>
@@ -4519,6 +4512,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 						<xsl:with-param name="codes">c</xsl:with-param>
 					</xsl:call-template>
 				</note>
+		</xsl:if>
 
 	</xsl:template>
 
