@@ -6,11 +6,12 @@
 	<xsl:strip-space elements="*"/>
 
 	<!-- Maintenance note: For each revision, change the content of <recordInfo><recordOrigin> to reflect the new revision number.
-	MARC21slim2MODS3-5 (Revision 1.101) 20140806
+	MARC21slim2MODS3-5 (Revision 1.102) 20140812
 	
+Revision 1.102 - Fixed 240$s duplication tmee 20140812
 Revision 1.101 - Fixed 130 tmee 20140806
 Revision 1.100 - Fixed 245c tmee 20140804
-Revision 1.99 - Fixed 240 tmee 20140804
+Revision 1.99 - Fixed 240 issue tmee 20140804
 Revision 1.98 - Fixed 336 mapping tmee 20140522
 Revision 1.97 - Fixed 264 mapping tmee 20140521
 Revision 1.96 - Fixed 310 and 321 and 008 frequency authority for marcfrequency tmee 2014/04/22
@@ -25,7 +26,7 @@ Revision 1.89 - Fixed 008-06 when value = 's' for cartographics tmee tmee 2014/0
 Revision 1.88 - Fixed 510c mapping - tmee 2013/08/29
 Revision 1.87 - Fixed expressions of <accessCondition> type values - tmee 2013/08/29
 Revision 1.86 - Fixed 008 <frequency> subfield to occur w/i <originiInfo> - tmee 2013/08/29
-Revision 1.85 - Fixed 245 $c - tmee 2013/03/07
+Revision 1.85 - Fixed 245$c - tmee 2013/03/07
 Revision 1.84 - Fixed 1.35 and 1.36 date mapping for 008 when 008/06=e,p,r,s,t so only 008/07-10 displays, rather than 008/07-14 - tmee 2013/02/01   
 Revision 1.83 - Deleted mapping for 534 to note - tmee 2013/01/18
 Revision 1.82 - Added mapping for 264 ind 0,1,2,3 to originInfo - 2013/01/15 tmee
@@ -2665,7 +2666,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 			</xsl:for-each>
 
 			<recordOrigin>Converted from MARCXML to MODS version 3.5 using MARC21slim2MODS3-5.xsl
-				(Revision 1.101 2014/08/06)</recordOrigin>
+				(Revision 1.102 2014/08/12)</recordOrigin>
 
 			<xsl:for-each select="marc:datafield[@tag=040]/marc:subfield[@code='b']">
 				<languageOfCataloging>
@@ -4211,6 +4212,7 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 	</xsl:template>
 
 	<!-- 240 nameTitleGroup-->
+	<!-- 1.102 -->
 
 	<xsl:template name="createTitleInfoFrom240">
 		<titleInfo type="uniform">
@@ -4224,10 +4226,6 @@ Revision 1.02 - Added Log Comment  2003/03/24 19:37:42  ckeith
 			<title>
 				<xsl:variable name="str">
 					<xsl:for-each select="marc:subfield">
-						<xsl:if test="(contains('s',@code))">
-							<xsl:value-of select="text()"/>
-							<xsl:text> </xsl:text>
-						</xsl:if>
 						<xsl:if
 							test="(contains('adfklmors',@code) and (not(../marc:subfield[@code='n' or @code='p']) or (following-sibling::marc:subfield[@code='n' or @code='p'])))">
 							<xsl:value-of select="text()"/>
